@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RED-X | HWID Reset</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+            --primary-light: #ef4444;
+            --secondary: #1e293b;
+            --dark: #0f0f0f;
+            --dark-light: #1a1a1a;
+            --text: #f8fafc;
+            --text-light: #cbd5e1;
+            --accent: #f97316;
+            --card-bg: rgba(26, 26, 26, 0.8);
+            --card-border: rgba(220, 38, 38, 0.2);
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, var(--dark) 0%, #1a0000 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Entrance Card Overlay */
+        .entrance-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: all 1s ease;
+        }
+
+        .entrance-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .entrance-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 60px 40px;
+            max-width: 700px;
+            width: 90%;
+            border: 2px solid var(--card-border);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: entranceFloat 8s ease-in-out infinite;
+            transition: all 0.5s ease;
+        }
+
+        .entrance-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(220, 38, 38, 0.3);
+        }
+
+        @keyframes entranceFloat {
+            0% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(0.5deg); }
+            50% { transform: translateY(0px) rotate(0deg); }
+            75% { transform: translateY(-5px) rotate(-0.5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .entrance-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--primary), var(--accent), var(--primary-dark), var(--primary));
+            background-size: 400%;
+            z-index: -1;
+            border-radius: 20px;
+            opacity: 0.7;
+            animation: glow 8s linear infinite;
+            filter: blur(15px);
+            transition: all 0.5s ease;
+        }
+
+        .entrance-card:hover::before {
+            opacity: 0.9;
+            filter: blur(20px);
+        }
+
+        @keyframes glow {
+            0% { background-position: 0 0; }
+            50% { background-position: 400% 0; }
+            100% { background-position: 0 0; }
+        }
+
+        .entrance-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            transition: all 0.5s ease;
+        }
+
+        .entrance-card:hover .entrance-logo {
+            transform: scale(1.05);
+        }
+
+        .entrance-logo-icon {
+            color: var(--primary);
+            font-size: 3rem;
+            animation: logoPulse 2s infinite;
+            transition: all 0.5s ease;
+        }
+
+        .entrance-card:hover .entrance-logo-icon {
+            animation: logoPulseHover 0.5s infinite;
+            color: var(--accent);
+        }
+
+        @keyframes logoPulse {
+            0% { transform: scale(1); text-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
+            50% { transform: scale(1.1); text-shadow: 0 0 20px rgba(220, 38, 38, 0.8); }
+            100% { transform: scale(1); text-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
+        }
+
+        @keyframes logoPulseHover {
+            0% { transform: scale(1.05); text-shadow: 0 0 15px rgba(249, 115, 22, 0.7); }
+            50% { transform: scale(1.15); text-shadow: 0 0 25px rgba(249, 115, 22, 0.9); }
+            100% { transform: scale(1.05); text-shadow: 0 0 15px rgba(249, 115, 22, 0.7); }
+        }
+
+        .entrance-logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: textShimmer 3s infinite;
+            transition: all 0.5s ease;
+        }
+
+        .entrance-card:hover .entrance-logo-text {
+            animation: textShimmerHover 1s infinite;
+            letter-spacing: 2px;
+        }
+
+        @keyframes textShimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes textShimmerHover {
+            0% { background-position: -100% center; }
+            100% { background-position: 100% center; }
+        }
+
+        .entrance-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: var(--text);
+            animation: titleGlow 3s infinite alternate;
+            transition: all 0.5s ease;
+        }
+
+        .entrance-card:hover .entrance-title {
+            animation: titleGlowHover 1s infinite alternate;
+            transform: translateY(-5px);
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 5px rgba(220, 38, 38, 0.5); }
+            100% { text-shadow: 0 0 15px rgba(220, 38, 38, 0.8), 0 0 25px rgba(220, 38, 38, 0.6); }
+        }
+
+        @keyframes titleGlowHover {
+            0% { text-shadow: 0 0 10px rgba(220, 38, 38, 0.7), 0 0 20px rgba(220, 38, 38, 0.5); }
+            100% { text-shadow: 0 0 20px rgba(220, 38, 38, 0.9), 0 0 35px rgba(220, 38, 38, 0.7), 0 0 45px rgba(220, 38, 38, 0.5); }
+        }
+
+        .entrance-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            transition: all 0.5s ease;
+        }
+
+        .entrance-card:hover .entrance-subtitle {
+            color: var(--text);
+            transform: translateY(-3px);
+        }
+
+        .entrance-products {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .entrance-product-tag {
+            background: rgba(220, 38, 38, 0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            border: 1px solid rgba(220, 38, 38, 0.4);
+            transition: all 0.3s ease;
+            animation: tagPulse 2s infinite alternate;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .entrance-product-tag::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .entrance-product-tag:hover::before {
+            left: 100%;
+        }
+
+        .entrance-product-tag:hover {
+            background: rgba(220, 38, 38, 0.4);
+            transform: scale(1.2) translateY(-5px);
+            animation: none;
+            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
+        }
+
+        @keyframes tagPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(220, 38, 38, 0.4); }
+            100% { transform: scale(1.05); box-shadow: 0 0 15px rgba(220, 38, 38, 0.6); }
+        }
+
+        .entrance-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 15px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            animation: btnPulse 2s infinite;
+        }
+
+        @keyframes btnPulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+
+        .entrance-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .entrance-btn:hover::before {
+            left: 100%;
+        }
+
+        .entrance-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 25px rgba(220, 38, 38, 0.4);
+            animation: none;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+        }
+
+        /* Main Content */
+        .main-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease;
+        }
+
+        .main-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Animated Header */
+        header {
+            background: rgba(15, 15, 15, 0.95);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border);
+            animation: headerSlide 1s ease;
+        }
+
+        @keyframes headerSlide {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.5rem;
+            position: relative;
+            transition: all 0.5s ease;
+            animation: logoPulse 2s infinite;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            transition: all 0.3s ease;
+            animation: textShimmer 3s infinite;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        nav a:hover {
+            color: var(--primary-light);
+            animation: linkGlow 0.5s forwards;
+        }
+
+        @keyframes linkGlow {
+            to { text-shadow: 0 0 10px rgba(220, 38, 38, 0.8); }
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 60px 0 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, var(--text), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            display: inline-block;
+            animation: titleGlow 3s infinite alternate;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        /* Guide Section */
+        .guide-section {
+            margin-bottom: 80px;
+            padding: 50px 0;
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .guide-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 50%, rgba(220, 38, 38, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 50px;
+            text-align: center;
+            color: var(--primary-light);
+            animation: textShimmer 4s infinite;
+        }
+
+        .steps-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+            padding: 30px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .step:hover::before {
+            transform: scaleX(1);
+        }
+
+        .step:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+            transition: all 0.4s ease;
+            animation: iconRotate 10s linear infinite;
+        }
+
+        @keyframes iconRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .step:hover .step-icon {
+            transform: scale(1.1) rotate(180deg);
+            animation: none;
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--primary-light);
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .step:hover .step-title {
+            animation: textVibrate 0.3s ease;
+        }
+
+        @keyframes textVibrate {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            50% { transform: translateX(3px); }
+            75% { transform: translateX(-3px); }
+            100% { transform: translateX(0); }
+        }
+
+        .step-description {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .note-box {
+            background: rgba(220, 38, 38, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left;
+            border-radius: 0 8px 8px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.2); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+
+        .note-box p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .note-box strong {
+            color: var(--primary-light);
+        }
+
+        /* Products Section */
+        .products-section {
+            padding: 60px 0;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--card-border);
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .product-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.2), 0 0 30px rgba(220, 38, 38, 0.2);
+            border-color: rgba(220, 38, 38, 0.6);
+        }
+
+        .product-header {
+            padding: 25px 25px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-badge {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            animation: badgeGlow 3s infinite alternate;
+        }
+
+        @keyframes badgeGlow {
+            0% { box-shadow: 0 0 5px rgba(220, 38, 38, 0.5); }
+            100% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.8); }
+        }
+
+        .product-image-container {
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            margin: 15px 25px;
+            border-radius: 12px;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.08);
+        }
+
+        .zoom-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+
+        .product-image-container:hover .zoom-overlay {
+            opacity: 1;
+        }
+
+        .zoom-icon {
+            color: white;
+            font-size: 2rem;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+            animation: zoomPulse 2s infinite;
+        }
+
+        @keyframes zoomPulse {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1); }
+            100% { transform: scale(0.8); }
+        }
+
+        .product-image-container:hover .zoom-icon {
+            transform: scale(1);
+            animation: none;
+        }
+
+        .product-content {
+            padding: 0 25px 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .product-title {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            color: var(--primary-light);
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .product-title {
+            color: var(--accent);
+            animation: textGlitch 0.3s;
+        }
+
+        @keyframes textGlitch {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-3px); }
+            40% { transform: translateX(3px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+            100% { transform: translateX(0); }
+        }
+
+        .product-description {
+            margin-bottom: 20px;
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .product-description {
+            color: var(--text);
+        }
+
+        .product-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .product-features li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .product-features li {
+            transform: translateX(10px);
+        }
+
+        .product-features i {
+            color: var(--success);
+            margin-right: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .product-features i {
+            transform: scale(1.3) rotate(10deg);
+            color: var(--primary);
+        }
+
+        .select-btn {
+            width: 100%;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 14px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: block;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .select-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .select-btn:hover::before {
+            left: 100%;
+        }
+
+        .select-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Image Zoom Modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(220, 38, 38, 0.3);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(220, 38, 38, 0.7);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .close-modal:hover {
+            transform: rotate(90deg);
+            background: rgba(220, 38, 38, 1);
+        }
+
+        /* Footer */
+        footer {
+            padding: 50px 0 20px;
+            border-top: 1px solid var(--card-border);
+            margin-top: 60px;
+            background: rgba(15, 15, 15, 0.7);
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -5px;
+            left: 0;
+            background: var(--primary-light);
+            transition: width 0.3s;
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            color: var(--text);
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-light);
+            transform: translateY(-3px);
+        }
+
+        .social-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: var(--primary-light);
+            transition: width 0.3s;
+        }
+
+        .social-links a:hover::after {
+            width: 100%;
+        }
+
+        .copyright {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            margin-top: 20px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Particle container */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Custom cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(220, 38, 38, 0.5);
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.2s;
+        }
+
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.4s;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            nav ul {
+                gap: 15px;
+            }
+
+            .entrance-logo {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .entrance-logo-text {
+                font-size: 2rem;
+            }
+
+            .entrance-title {
+                font-size: 1.8rem;
+            }
+
+            .entrance-products {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-links {
+                gap: 15px;
+            }
+            
+            .modal-content {
+                max-width: 95%;
+            }
+            
+            .steps-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .step {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+    <!-- Entrance Card Overlay -->
+    <div class="entrance-overlay" id="entranceOverlay">
+        <div class="entrance-card">
+            <div class="entrance-logo">
+                <i class="fas fa-microchip entrance-logo-icon"></i>
+                <div class="entrance-logo-text">RED-X</div>
+            </div>
+            
+            <h2 class="entrance-title">RED-X PRODUCTS HWID RESET</h2>
+            <p class="entrance-subtitle">Professional hardware ID reset service with premium gaming features. Access our elite tools to reset your HWID safely and efficiently.</p>
+            
+            <div class="entrance-products">
+                <span class="entrance-product-tag">RED-X LITE</span>
+                <span class="entrance-product-tag">RED-X ELITE</span>
+                <span class="entrance-product-tag">RED-X PREMIUM</span>
+            </div>
+            
+            <button class="entrance-btn" id="enterBtn">TAKE ME THERE</button>
+        </div>
+    </div>
+
+    <!-- Image Zoom Modal -->
+    <div class="image-modal" id="imageModal">
+        <div class="close-modal" id="closeModal">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="modal-content">
+            <img class="modal-image" id="modalImage" src="" alt="Product Image">
+        </div>
+    </div>
+
+    <!-- Main Content (Initially Hidden) -->
+    <div class="main-content" id="mainContent">
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="fas fa-microchip logo-icon"></i>
+                        <div class="logo-text">RED-X</div>
+                    </div>
+                    <nav>
+                        <ul>
+                            <li><a href="#products">Products</a></li>
+                            <li><a href="#guide">Guide</a></li>
+                            <li><a href="#support">Support</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="container">
+                <h1 class="hero-title">HWID RESET SERVICE</h1>
+                <p class="hero-subtitle">Professional hardware ID reset solutions for gamers and developers. Secure, reliable, and easy to use.</p>
+            </div>
+        </section>
+
+        <div class="container">
+            <!-- Guide Section -->
+            <section class="guide-section" id="guide">
+                <h2 class="section-title">HOW TO RESET HWID</h2>
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-icon">1</div>
+                        <h3 class="step-title">Select Product</h3>
+                        <p class="step-description">Click on "CLICK TO RESET HWID" for your product</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon">2</div>
+                        <h3 class="step-title">Login</h3>
+                        <p class="step-description">Enter your username and password</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon">3</div>
+                        <h3 class="step-title">Reset HWID</h3>
+                        <p class="step-description">Click on "RESET HWID" to complete</p>
+                    </div>
+                </div>
+                <div class="note-box">
+                    <p><strong>Note:</strong> You can reset your HWID only once per week</p>
+                </div>
+            </section>
+            
+            <!-- Products Section -->
+            <section class="products-section" id="products">
+                <h2 class="section-title">OUR PRODUCTS</h2>
+                <div class="product-grid">
+                    <!-- RED-X LITE -->
+                    <div class="product-card">
+                        <div class="product-header">
+                            <h3 class="product-title">RED-X LITE</h3>
+                            <span class="product-badge">FREE</span>
+                        </div>
+                        <div class="product-image-container">
+                            <img class="product-image" src="https://i.ibb.co.com/DHCQW5Zv/image.png" alt="RED-X LITE">
+                            <div class="zoom-overlay">
+                                <div class="zoom-icon">
+                                    <i class="fas fa-search-plus"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-description">LIFETIME FREE PANEL FROM RED-X</p>
+                            <ul class="product-features">
+                                <li><i class="fas fa-check"></i> Aimbot Drag</li>
+                                <li><i class="fas fa-check"></i> Location menu</li>
+                                <li><i class="fas fa-check"></i> Basic features</li>
+                            </ul>
+                            <a href="https://licenseauth.online/panel/Anonymous94/RED-X%20LITE" class="select-btn">CLICK TO RESET</a>
+                        </div>
+                    </div>
+
+                    <!-- RED-X ELITE -->
+                    <div class="product-card">
+                        <div class="product-header">
+                            <h3 class="product-title">RED-X ELITE</h3>
+                            <span class="product-badge">BASIC</span>
+                        </div>
+                        <div class="product-image-container">
+                            <img class="product-image" src="https://i.ibb.co.com/kV0knpNX/image.png" alt="RED-X ELITE">
+                            <div class="zoom-overlay">
+                                <div class="zoom-icon">
+                                    <i class="fas fa-search-plus"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-description">RED-X BASIC PANEL</p>
+                            <ul class="product-features">
+                                <li><i class="fas fa-check"></i> Aimbot direct head</li>
+                                <li><i class="fas fa-check"></i> Aimbot keybind instant on/off</li>
+                                <li><i class="fas fa-check"></i> Location menu</li>
+                                <li><i class="fas fa-check"></i> Advanced settings</li>
+                            </ul>
+                            <a href="https://licenseauth.online/panel/Anonymous94/RED-X%20ELITE" class="select-btn">CLICK TO RESET</a>
+                        </div>
+                    </div>
+
+                    <!-- RED-X PREMIUM -->
+                    <div class="product-card">
+                        <div class="product-header">
+                            <h3 class="product-title">RED-X PREMIUM</h3>
+                            <span class="product-badge">PREMIUM</span>
+                        </div>
+                        <div class="product-image-container">
+                            <img class="product-image" src="https://i.ibb.co.com/VWvsck4T/image.png" alt="RED-X PREMIUM">
+                            <div class="zoom-overlay">
+                                <div class="zoom-icon">
+                                    <i class="fas fa-search-plus"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <p class="product-description">PREMIUM PRODUCT FROM RED-X</p>
+                            <ul class="product-features">
+                                <li><i class="fas fa-check"></i> Aimbot head, drag, etc</li>
+                                <li><i class="fas fa-check"></i> Aimbot keybind instant on/off</li>
+                                <li><i class="fas fa-check"></i> Aimbot Female fix</li>
+                                <li><i class="fas fa-check"></i> Sniper menu</li>
+                                <li><i class="fas fa-check"></i> Brutal menu</li>
+                                <li><i class="fas fa-check"></i> Location menu</li>
+                                <li><i class="fas fa-check"></i> Mobile Control</li>
+                            </ul>
+                            <a href="https://licenseauth.online/panel/Anonymous94/RED-X%20PREMIUM" class="select-btn">CLICK TO RESET</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer id="contact">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="logo">
+                        <i class="fas fa-microchip logo-icon"></i>
+                        <div class="logo-text">RED-X</div>
+                    </div>
+                    <div class="footer-links">
+                        <a href="#products">Products</a>
+                        <a href="#guide">Guide</a>
+                        <a href="#support">Support</a>
+                        <a href="#contact">Contact</a>
+                    </div>
+                    <div class="social-links">
+                        <a href="https://discord.gg/f7KPc9JyeY"><i class="fab fa-discord"></i></a>
+                        <a href="https://instagram.com/mohtasimjitu"><i class="fab fa-instagram"></i></a>
+                        <a href="https://github.com/REDX-CORPORATION"><i class="fab fa-github"></i></a>
+                        <a href="https://t.me/+OglBPVcrngY1OGQ9"><i class="fab fa-telegram"></i></a>
+                    </div>
+                    <p class="copyright">© 2023 RED-X. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Initialize particles.js with enhanced visibility
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 120, density: { enable: true, value_area: 800 } },
+                color: { value: "#dc2626" },
+                shape: { type: "circle" },
+                opacity: { value: 0.8, random: true },
+                size: { value: 4, random: { enable: true, minimumValue: 2 } },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#dc2626",
+                    opacity: 0.4,
+                    width: 1.5
+                },
+                move: {
+                    enable: true,
+                    speed: 3,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false,
+                    attract: { enable: true, rotateX: 600, rotateY: 1200 }
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" },
+                    resize: true
+                },
+                modes: {
+                    repulse: { distance: 100, duration: 0.4 },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+
+        // Hover effects for cursor
+        document.querySelectorAll('a, button, .product-card, .step, .entrance-card, .entrance-product-tag').forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'scale(1.5)';
+                cursorFollower.style.transform = 'scale(1.5)';
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'scale(1)';
+                cursorFollower.style.transform = 'scale(1)';
+            });
+        });
+
+        // Entrance functionality
+        const entranceOverlay = document.getElementById('entranceOverlay');
+        const mainContent = document.getElementById('mainContent');
+        const enterBtn = document.getElementById('enterBtn');
+
+        enterBtn.addEventListener('click', () => {
+            // Hide entrance overlay with animation
+            entranceOverlay.classList.add('hidden');
+            
+            // Show main content with animation
+            setTimeout(() => {
+                mainContent.classList.add('visible');
+                document.body.style.overflow = 'auto';
+            }, 500);
+        });
+
+        // Animate elements on scroll
+        const animateOnScroll = () => {
+            const productCards = document.querySelectorAll('.product-card');
+            const steps = document.querySelectorAll('.step');
+            const windowHeight = window.innerHeight;
+            
+            productCards.forEach((card, index) => {
+                const cardPosition = card.getBoundingClientRect().top;
+                
+                if (cardPosition < windowHeight - 100) {
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 200);
+                }
+            });
+            
+            steps.forEach((step, index) => {
+                const stepPosition = step.getBoundingClientRect().top;
+                
+                if (stepPosition < windowHeight - 100) {
+                    setTimeout(() => {
+                        step.style.opacity = '1';
+                        step.style.transform = 'translateY(0)';
+                    }, index * 200);
+                }
+            });
+        };
+
+        // Animation on scroll
+        window.addEventListener('scroll', animateOnScroll);
+
+        // Add click effect to buttons
+        document.querySelectorAll('.select-btn, .entrance-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Create ripple effect
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Add CSS for ripple effect
+        const style = document.createElement('style');
+        style.textContent = `
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.5);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+            }
+            
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Image Zoom Functionality
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.getElementById('closeModal');
+        
+        // Add click event to all product images
+        document.querySelectorAll('.product-image-container').forEach(container => {
+            container.addEventListener('click', function() {
+                const imageSrc = this.querySelector('.product-image').src;
+                modalImage.src = imageSrc;
+                imageModal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+            });
+        });
+        
+        // Close modal when clicking the close button
+        closeModal.addEventListener('click', function() {
+            imageModal.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
+        });
+        
+        // Close modal when clicking outside the image
+        imageModal.addEventListener('click', function(e) {
+            if (e.target === imageModal) {
+                imageModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && imageModal.classList.contains('active')) {
+                imageModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
+</body>
+</html>
